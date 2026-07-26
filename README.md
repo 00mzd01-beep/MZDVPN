@@ -17,25 +17,12 @@
 - [Why Nahan?](#-why-nahan)
 - [Key Features](#-key-features)
 - [Prerequisites](#-prerequisites)
+- [Quick Install Options](#-quick-install-options)
 - [Step-by-Step Deployment Guide](#-step-by-step-deployment-guide)
-  - [Step 1: Create a D1 Database](#step-1-create-a-d1-database)
-  - [Step 2: Deploy the Worker](#step-2-deploy-the-worker)
-  - [Step 3: Bind the D1 Database](#step-3-bind-the-d1-database)
-  - [Step 4: Access the Dashboard](#step-4-access-the-dashboard)
-  - [Step 5: First-Time Configuration](#step-5-first-time-configuration)
 - [Dashboard Guide](#-dashboard-guide)
-  - [Endpoints (Info)](#-endpoints-info)
-  - [Metrics (Network)](#-metrics-network)
-  - [System (Settings)](#️-system-settings)
-  - [Advanced (Network)](#-advanced-network)
-  - [Activity Logs](#-activity-logs)
 - [Advanced Configuration](#-advanced-configuration)
-  - [Multi-User Profiles](#multi-user-profiles)
-  - [Clean IP Multiplexer](#clean-ip-multiplexer)
-  - [Telegram Bot Integration](#telegram-bot-integration)
-  - [Kill Switch](#kill-switch)
+- [Useful Resources](#-useful-resources)
 - [Applying Configuration Changes](#-applying-configuration-changes)
-- [File Structure](#-file-structure)
 - [FAQ & Troubleshooting](#-faq--troubleshooting)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -77,6 +64,7 @@ Nahan isn't just a proxy script — it's a complete management solution designed
 | 🏷️ **Rich Name Strategy** | Config naming with `{FLAG}`, `{COUNTRY}`, `{CITY}`, `{ISP}`, `{HOST}`, `{DATE}`, `{WORKER}` tags |
 | 🌐 **Bilingual Subscription Page** | Subscription info page with full **Persian/Farsi** and **English** support, RTL layout, and dark/light mode toggle |
 | 🤖 **Telegram Bot Management** | Full gateway management via inline Telegram buttons — users, settings, logs, and advanced config |
+| 🔗 **Linked Panels (Other Nodes)** | Connect multiple Nahan panels securely with API Keys for cross-panel management and update propagation |
 
 ---
 
@@ -89,282 +77,171 @@ Nahan isn't just a proxy script — it's a complete management solution designed
 
 ---
 
-## 🚀 Step-by-Step Deployment Guide
+## 🚀 Quick Install Options
 
-Follow these steps to get your Nahan gateway running in under 5 minutes.
+For easier deployment you can use:
+
+- **Telegram Install Bot:** [@itsyebekhebot](https://t.me/itsyebekhebot)
+- **Web Installer:** [https://erpycode.github.io/nahan-installer/](https://erpycode.github.io/nahan-installer/)
+
+Or follow the manual steps below.
+
+---
+
+## 🚀 Step-by-Step Deployment Guide
 
 ### Step 1: Create a D1 Database
 
-Nahan stores all configuration in a Cloudflare D1 SQLite database. You must create this first.
-
 1. Log in to the [Cloudflare Dashboard](https://dash.cloudflare.com/).
-2. In the left sidebar, go to **Storage and databases** → **D1 SQLite Database**.
+2. Go to **Storage and databases** → **D1 SQLite Database**.
 3. Click **Create database**.
-4. Enter a name for your database — the suggested name is `iot_db` (the exact name doesn't matter).
-5. Click **Create** to confirm.
-
-> ✅ Your D1 database is now ready. Keep this page open — you'll need it in Step 3.
-
----
+4. Enter a name (e.g. `iot_db`) and click **Create**.
 
 ### Step 2: Deploy the Worker
 
-1. In the Cloudflare Dashboard, navigate to **Workers & Pages** → **Overview**.
-2. Click **Create application** → **Create Worker**.
-3. Enter a name for your worker (e.g., `nahan-core`).
-4. Click **Deploy** to create the worker with placeholder code.
-5. On the confirmation screen, click **Edit code** to open the online editor.
-6. Select all existing placeholder code and **delete it**.
-7. Open the Nahan repository and go to [`_worker.js`](https://github.com/itsyebekhe/nahan/blob/main/_worker.js).
-8. Click **Raw**, then select all and copy the full contents.
-9. Paste the copied code into the Cloudflare editor.
-10. Click **Save and Deploy**.
-
-> ✅ Your worker is deployed. It will not function fully until the D1 database is bound in the next step.
-
----
+1. Go to **Workers & Pages** → **Create application** → **Create Worker**.
+2. Name it (e.g. `nahan-core`) and click **Deploy**.
+3. Click **Edit code**, delete the placeholder, and paste the full content of [`_worker.js`](https://github.com/itsyebekhe/nahan/blob/main/_worker.js).
+4. Click **Save and Deploy**.
 
 ### Step 3: Bind the D1 Database
 
-This step connects your D1 database to the worker so Nahan can read and write its configuration.
-
-1. From the Workers & Pages overview, click on your worker (e.g., `nahan-core`).
-2. Go to the **Settings** tab.
-3. Scroll to the **Bindings** section and click **Add binding**.
-4. Select **D1 database** as the binding type.
-5. Fill in the two fields:
-   - **Variable name:** `IOT_DB` ← this must be exact, regardless of your database's actual name
-   - **D1 Database:** Select the database you created in Step 1
-6. Click **Save**.
-7. Return to the worker overview and click **Deploy** (or **Redeploy**) to apply the binding.
-
-> ✅ Nahan can now read and write persistent configuration data.
-
----
+1. Open your Worker → **Settings** → **Bindings** → **Add binding**.
+2. Type: **D1 database**
+3. Variable name: **`IOT_DB`** (must be exact)
+4. Select the database you created → **Save** → **Deploy**.
 
 ### Step 4: Access the Dashboard
 
-1. From your worker's overview page, copy the worker URL — it looks like:
-   ```
-   https://nahan-core.<your-subdomain>.workers.dev
-   ```
-2. In a browser, navigate to:
-   ```
-   https://<your-worker-domain>/sync/dash
-   ```
+Open:
 
-   > **Note:** Visiting the root URL (`/`) or `/sync` without `/dash` intentionally shows a camouflage page (e.g., Ubuntu or Docker) to fool network scanners. This is expected behavior.
+```
+https://<your-worker-domain>/sync/dash
+```
 
-3. You should see the Nahan login screen.
-
----
+> Visiting `/` or `/sync` without `/dash` shows a camouflage page (Ubuntu/Docker). This is intentional.
 
 ### Step 5: First-Time Configuration
 
-1. Enter the default master key and click **Authenticate**:
-   ```
-   admin
-   ```
-
-   > ⚠️ **If you see `⚠️ IOT_DB namespace missing!`** — your D1 database binding is not set up correctly. Return to Step 3.
-
-2. You are now inside the Nahan dashboard.
-
-3. **Immediately** go to the **System** tab and:
-   - Change the **Master Key** from `admin` to a strong, private passphrase.
-   - Change the **API Route** from `sync` to a secret keyword (e.g., `my-secret-path`). Your dashboard will move to `/<new-route>/dash`.
-   - Set your **Device UUID** or leave it blank to auto-generate one.
-
-4. Click **Update Config** to save.
-
-> ✅ Your gateway is now live and secured.
+1. Login with the default master key: `admin`
+2. Immediately go to **System** tab and:
+   - Change **Master Key**
+   - Change **API Route** to a secret path (bookmark the new URL!)
+   - Set or auto-generate **Device UUID**
+3. Click **Update Config**.
 
 ---
 
 ## 🖥️ Dashboard Guide
 
-The dashboard has **5 sections** accessible via the top navigation tabs.
+The dashboard includes these main sections:
 
----
-
-### 📡 Endpoints (Info)
-
-Retrieve your connection strings to import into a proxy client (e.g., v2rayN, Hiddify, Shadowrocket, Nekoray).
-
-- **Profile Cards:** Each configured profile (Default + Multi-User) appears as a card.
-- **Show QR Code:** Tap **Show QR Code** on any card to display a scannable QR — great for mobile setup.
-- **Cloud Sync URL:** The subscription URL for your client app. Use the copy button to grab it.
-
----
-
-### 📊 Metrics (Network)
-
-Live diagnostics about the Cloudflare edge node processing your requests.
-
-- **Live Profile Usage:** Active connection counts and last activity timestamps per profile (resets on worker restart).
-- **Network Cards:** Origin IP, executing Edge Node (Colo), and regional metadata.
-- **Latency Diagnostics:** Click **Run Diagnostics** to measure real-time latency to your configured Clean IPs.
-
----
-
-### ⚙️ System (Settings)
-
-Core gateway configuration:
-
-| Setting | Description |
+| Tab | Purpose |
 |---|---|
-| **Primary Display Mode** | Toggle between `Alpha` (VLESS), `Beta` (Trojan), or both |
-| **Device UUID** | Connection identifier/password. Leave blank to auto-generate |
-| **API Route** | Change from `sync` to a secret keyword — moves the dashboard to `/<keyword>/dash` |
-| **Master Key** | Login password. Change from `admin` immediately |
-| **Backup & Restore** | Export all settings to `.json` or restore from a previous backup |
-
----
-
-### 🌐 Advanced (Network)
-
-Fine-tune transport and integrations:
-
-| Setting | Description |
-|---|---|
-| **Clean IPs** | Comma/line-separated Cloudflare clean IPs — subscription auto-multiplies configs for each |
-| **Multi-User Profiles** | `uuid:Name` format entries for per-user subscription links |
-| **Telegram Bot** | Bot Token + Chat ID for login alerts and remote management |
-| **Cloudflare Analytics** | Account ID + API Token to monitor daily request usage (100k/day free limit) |
-| **Kill Switch** | Instantly pause all proxy traffic without deleting the worker |
-| **Secure Hello (ECH)** | Toggle Encrypted Client Hello in generated configs |
-
----
-
-### 📋 Activity Logs
-
-Timestamped history of all login attempts and configuration changes for auditing.
+| **Overview** | User summary cards, traffic stats, and update banner |
+| **Endpoints** | Connection URIs, QR codes, and subscription links |
+| **Metrics** | Live usage, Origin IP, Edge Node (Colo), latency diagnostics |
+| **System** | Core settings (protocol, UUID, API Route, Master Key, ports, Auto-Update, Panel API Keys, Backup) |
+| **Advanced** | Clean IPs, Linked Panels, Multi-User, Telegram, Kill Switch, ECH, NAT64, etc. |
+| **Logs** | Login attempts and configuration change history |
+| **Clients** | Visual multi-user management |
+| **Help** | Built-in help and FAQ |
 
 ---
 
 ## 🔩 Advanced Configuration
 
-### Multi-User Profiles
-
-1. Go to the **Advanced** tab.
-2. In the **Multi-User Profiles** field, add entries (one per line) in this format:
-   ```
-   <uuid>:Username
-   ```
-   Example:
-   ```
-   550e8400-e29b-41d4-a716-446655440000:Alice
-   6ba7b810-9dad-11d1-80b4-00c04fd430c8:Bob
-   ```
-3. Each user accesses their config by appending `?sub=Username` to the Sync URL:
-   ```
-   https://<your-worker-domain>/sync/sub?sub=Alice
-   ```
-
----
-
 ### Clean IP Multiplexer
 
-1. Go to the **Advanced** tab.
-2. In **Clean IPs**, enter one IP or hostname per line (or comma-separated):
-   ```
-   1.2.3.4
-   5.6.7.8
-   cleanip.example.com
-   ```
-3. Click **Update Config**. The subscription output will include a separate config entry for each IP.
+In **Advanced** → **Clean IPs**, enter one IP (or `IP#Name`) per line. The subscription will contain a separate config for each IP.
 
----
+**Recommended tools for finding Clean IPs:**
+- GitHub: [senpaiscanner](https://github.com/senpaiscanner)
+- Telegram: [@itsZetaBot](https://t.me/itsZetaBot)
 
-### Telegram Bot Integration
+### Relay IP
 
-1. Create a bot via [@BotFather](https://t.me/botfather) and copy the **Bot Token**.
-2. Get your **Chat ID** from [@userinfobot](https://t.me/userinfobot).
-3. In the **Advanced** tab, enter your Bot Token and Chat ID.
-4. Click **Update Config**.
+Recommended bot: [@nahanproxyipbot](https://t.me/nahanproxyipbot)
 
-Available Telegram commands:
-- `/status` — Check gateway status
-- `/pause` — Activate the Kill Switch
+### Linked Panels (Other Nodes)
 
----
+Connect external Nahan panels using **URL + API Key** for cross-panel management and update propagation.  
+(Legacy `slaveNodes` / Cascade fields are automatically migrated to `linkedPanels`.)
+
+### Multi-User Profiles
+
+Format (one per line):
+
+```
+<uuid>:Username
+```
+
+Access: `https://<worker>/sync/sub?sub=Username`
+
+### Telegram Bot
+
+1. Create a bot via [@BotFather](https://t.me/botfather)
+2. Get Chat ID from [@userinfobot](https://t.me/userinfobot)
+3. Enter Token + Chat ID in Advanced tab and save
+
+Commands: `/status`, `/pause` (Kill Switch)
 
 ### Kill Switch
 
-To immediately suspend all proxy traffic:
+Toggle in Advanced (or send `/pause` via Telegram) to immediately stop all proxy traffic while keeping the worker alive.
 
-1. Go to the **Advanced** tab.
-2. Toggle **Kill Switch** to **ON**.
-3. Click **Update Config**.
+---
 
-Or send `/pause` to your Telegram bot. To re-enable, toggle it **OFF** and save.
+## 🔗 Useful Resources
+
+| Purpose | Resource |
+|---|---|
+| Clean IP finder | [senpaiscanner](https://github.com/senpaiscanner) · [@itsZetaBot](https://t.me/itsZetaBot) |
+| Relay IP | [@nahanproxyipbot](https://t.me/nahanproxyipbot) |
+| Easy Install (Telegram) | [@itsyebekhebot](https://t.me/itsyebekhebot) |
+| Web Installer | [erpycode.github.io/nahan-installer](https://erpycode.github.io/nahan-installer/) |
 
 ---
 
 ## 💾 Applying Configuration Changes
 
-After adjusting anything in **System** or **Advanced**:
+After changing anything in **System** or **Advanced**:
 
-1. Click **Update Config** at the bottom of the screen.
-2. The indicator shows **"Syncing..."** then the page auto-reloads.
-3. If you changed the **API Route**, the page will redirect to `/<new-route>/dash` — **bookmark the new URL**.
+1. Click **Update Config** at the bottom.
+2. Wait for “Syncing…” then the page reloads.
 
----
-
-## 📁 File Structure
-
-```
-nahan/
-├── _worker.js       # Main Cloudflare Worker script (the entire gateway)
-├── HELP.md          # English dashboard walkthrough
-├── HELP_FA.md       # Persian (فارسی) dashboard walkthrough
-├── README.md        # This file (English)
-├── README_FA.md     # Persian (فارسی) version of README
-└── version          # Current version indicator
-```
+If you changed the API Route, the page redirects to the new path — bookmark it.
 
 ---
 
 ## ❓ FAQ & Troubleshooting
 
-**Q: I see `⚠️ IOT_DB namespace missing!` after logging in.**
-> The D1 database is not bound to your worker. Go back to Step 3, add the `IOT_DB` D1 binding, and redeploy.
+**`⚠️ IOT_DB namespace missing!`**  
+→ D1 binding is missing or the variable name is not exactly `IOT_DB`. Fix in Worker Settings → Bindings and redeploy.
 
-**Q: My worker's root URL shows a random website instead of the dashboard.**
-> This is intentional — Nahan camouflages itself. Always use `https://<your-worker-domain>/sync/dash`.
+**Root URL shows Ubuntu/Docker**  
+→ Expected behavior. Always use `/sync/dash` (or your custom API Route + `/dash`).
 
-**Q: I changed the API Route and can't find the dashboard anymore.**
-> Your dashboard moved to `https://<your-worker-domain>/<new-route>/dash`. If you've forgotten the route, check the D1 database via the Cloudflare Dashboard → **D1** → your database → browse the `kv_store` table.
+**Forgot Master Key or API Route**  
+→ Check values in the D1 Console (`sys_config` key).
 
-**Q: I forgot my Master Key.**
-> In the Cloudflare Dashboard, go to **D1** → your database → **Console**, and run:
-> ```sql
-> SELECT * FROM kv_store WHERE key = 'masterKey';
-> ```
-> You can also `UPDATE` or `DELETE` the row to reset it.
-
-**Q: How do I update to a newer version of Nahan?**
-> Repeat Step 2: open the Worker code editor, replace the code with the latest `_worker.js`, and save. Your D1 configuration is preserved.
-
-**Q: How many requests can I handle on the free tier?**
-> Cloudflare Workers free tier allows **100,000 requests/day**. Monitor usage via the Cloudflare Analytics integration in the Advanced tab.
+**Free plan limits**  
+→ 100,000 requests/day. Monitor via Cloudflare Analytics integration in Advanced.
 
 ---
 
 ## 🤝 Contributing
 
-1. Fork the repository.
-2. Create a branch: `git checkout -b feature/my-feature`
-3. Make your changes to `_worker.js`.
-4. Commit: `git commit -m "Add my feature"`
-5. Push: `git push origin feature/my-feature`
-6. Open a Pull Request.
+1. Fork the repository
+2. Create a branch
+3. Make your changes
+4. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](./LICENSE) file for details.
+MIT License — see [LICENSE](./LICENSE)
 
 ---
 
