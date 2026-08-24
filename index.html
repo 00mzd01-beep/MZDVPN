@@ -29,7 +29,7 @@
             <div class="flex items-center gap-3">
                 <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
                 <span class="font-extrabold text-slate-900 dark:text-white tracking-tight text-lg">نهان / مستندات فنی و مصور</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">v2.5.4.2</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">v3.0.1</span>
             </div>
             <div class="flex items-center gap-3">
                 <button id="theme-toggle" class="p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition" aria-label="تغییر پوسته">
@@ -64,7 +64,7 @@
                         <a href="#users" class="block px-3 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg transition">مدیریت کاربران و انقضا</a>
                         
                         <p class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-3 pt-4 mb-2">ابزارهای توسعه‌دهنده</p>
-                        <a href="#obfuscator-section" class="block px-3 py-2 text-slate-800 dark:text-indigo-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-900/50 rounded-lg transition">دریافت و مبهم‌سازی کدهای ورکر</a>
+                        <a href="#encoded-worker-section" class="block px-3 py-2 text-slate-800 dark:text-indigo-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-900/50 rounded-lg transition">دریافت کدهای ورکر (_worker.encode.js)</a>
                     </nav>
                 </div>
             </aside>
@@ -303,59 +303,53 @@
                         <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">مدیریت کاربران و قطع خودکار</h2>
                     </div>
                     <div class="text-slate-600 dark:text-slate-400 text-xs sm:text-sm space-y-3 leading-relaxed text-justify">
-                        <p>یکی از کاربردی‌ترین قابلیت‌های ارائه‌شده در نسخه ۲.۵.۴.۲، سیستم توقف اتوماتیک حساب‌های مصرفی و منقضی‌شده (Auto-Disable) است.</p>
+                        <p>یکی از کاربردی‌ترین قابلیت‌های ارائه‌شده در نسخه ۳.۰.۱، سیستم توقف اتوماتیک حساب‌های مصرفی و منقضی‌شده (Auto-Disable) و کنترل لحظه‌ای تعداد کانفیگ‌ها است.</p>
                         <p>زمانی که ترافیک کلی مصرف‌شده یک کاربر از سقف مجاز فراتر رود یا انقضای زمانی وی به اتمام برسد، پایگاه داده SQLite D1 بلافاصله وضعیت آن کاربر را به صورت خودکار به حالت غیرفعال تغییر می‌دهد تا از بار اضافی ترافیکی ورکر جلوگیری شود.</p>
                     </div>
                 </section>
 
-                <section id="obfuscator-section" class="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                <section id="encoded-worker-section" class="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-800">
                     <div class="space-y-2">
-                        <h2 class="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">ابزار اختصاصی دریافت و مبهم‌سازی کدهای ورکر</h2>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">کدهای سورس ورکر (_worker.encode.js)</h2>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">آماده دپلو و پایدار</span>
+                        </div>
                         <p class="text-slate-600 dark:text-slate-400 text-xs sm:text-sm">
-                            در این بخش می‌توانید آخرین نسخه فایل اصلی را از گیت‌هاب دریافت کنید، آن را مشاهده نموده و با متود رمزنگاری ماژولار و بایت‌شفتینگ پیشرفته UTF-8، مبهم‌سازی (Obfuscate) کنید. این ابزار قادر است کدهای هر ورکری را به صورت پویا با ساختار کلودفلر همگام‌سازی کند.
+                            در نسخه ۳.۰.۱، کدهای ورکر به صورت رسمی و بهینه‌سازی‌شده در فایل <strong>_worker.encode.js</strong> کدگذاری شده‌اند تا بدون ریسک شناسایی توسط روبات‌های کلودفلر، به صورت مستقیم در ویرایشگر ورکر مستقر شوند. نیازی به انجام فرایند دستی مبهم‌سازی نیست.
                         </p>
                     </div>
 
-                    <div class="space-y-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
-                        <div class="flex flex-wrap gap-2 mb-2">
-                            <button id="fetch-code-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                دریافت زنده کدهای اصلی از گیت‌هاب
-                            </button>
+                    <div class="space-y-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                <span>فایل آماده استقرار: <code class="font-mono text-indigo-600 dark:text-indigo-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">_worker.js</code></span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="fetch-code-btn" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    دریافت مجدد از گیت‌هاب
+                                </button>
+                                <button id="copy-code-btn" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/20">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                    کپی تمام کدها
+                                </button>
+                                <button id="download-code-btn" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-indigo-600/20">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    دانلود فایل _worker.js
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-center">
-                            <div class="md:col-span-5 space-y-1.5">
-                                <div class="flex justify-between items-center text-xs text-slate-500 font-bold px-1">
-                                    <span>سورس کد اصلی ورکر (_worker.js)</span>
-                                    <button id="copy-original-btn" class="text-indigo-500 hover:text-indigo-600 transition-colors">کپی کد</button>
-                                </div>
-                                <textarea id="original-code-area" placeholder="کدهای ورکر را اینجا پیست کنید یا دکمه دریافت زنده را بزنید..." class="w-full h-80 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 rounded-xl font-mono text-xs text-slate-700 dark:text-slate-300 focus:border-indigo-500 outline-none resize-none transition-colors"></textarea>
-                            </div>
-
-                            <div class="md:col-span-1 flex flex-col items-center justify-center py-2 md:py-0">
-                                <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 select-none animate-pulse">
-                                    <svg class="w-5 h-5 hidden md:block rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                    <svg class="w-5 h-5 block md:hidden rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                                </div>
-                                <span class="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-widest hidden md:block">Auto Encrypt</span>
-                            </div>
-
-                            <div class="md:col-span-5 space-y-1.5">
-                                <div class="flex justify-between items-center text-xs text-slate-500 font-bold px-1">
-                                    <span>کدهای خروجی مبهم‌سازی شده (تضمینی کلودفلر)</span>
-                                    <div class="flex gap-2">
-                                        <button id="copy-obfuscated-btn" class="text-emerald-500 hover:text-emerald-600 transition-colors">کپی کد</button>
-                                        <button id="download-obfuscated-btn" class="text-indigo-500 hover:text-indigo-600 transition-colors">دانلود فایل</button>
-                                    </div>
-                                </div>
-                                <textarea id="obfuscated-code-area" readonly placeholder="کد مبهم‌سازی شده به صورت خودکار و آنی اینجا لود می‌شود..." class="w-full h-80 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 rounded-xl font-mono text-xs text-slate-700 dark:text-slate-300 focus:border-indigo-500 outline-none resize-none transition-colors"></textarea>
-                            </div>
+                        <div class="space-y-1.5">
+                            <textarea id="encoded-code-area" readonly placeholder="در حال بارگذاری کدهای سورس کدگذاری‌شده..." class="w-full h-96 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 rounded-xl font-mono text-xs text-slate-700 dark:text-slate-300 focus:border-indigo-500 outline-none resize-none transition-colors leading-relaxed"></textarea>
                         </div>
 
                         <div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2 leading-relaxed">
-                            <h4 class="font-bold text-slate-700 dark:text-slate-300">💡 مکانیزم فنی مبهم‌سازی ماژولار و بایت‌شفتینگ چطور کار می‌کند؟</h4>
-                            <p>این ابزار ابتدا به طور خودکار دستورات استاتیک `import` را در هر ورکری شناسایی و پیوندهای خروجی آن‌ها (Bindings) را استخراج می‌کند. ایمپورت‌ها به بالای ساختار لودر نهایی منتقل می‌شوند و پیوندها به عنوان پارامتر ورودی به بدنه رمزگشایی صادر می‌گردند. سورس‌کد با موتور بومی مرورگر (`TextEncoder`) به آرایه‌ای از بایت‌های خام UTF-8 تبدیل شده و پس از اعمال شیفت کلید تصادفی XOR، به صورت Base64 بسته‌بندی می‌شود. در نهایت گیت‌وی با کلاس استاندارد `TextDecoder` بایت‌ها را بدون هیچ‌گونه به هم ریختگی به کدهای اصلی بازمی‌گرداند و به کمک `new Function` اجرا می‌کند. همچنین، برای رفع تداخل با ساختار متغیرهای خارج از ماژول، ساختار `export default` در انتهای پردازش به انتهای بدنه اصلی الحاق (Append) می‌شود تا از وقوع ReferenceError جلوگیری شود.</p>
+                            <h4 class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                                <span>💡 راهنمای استقرار در کلودفلر:</span>
+                            </h4>
+                            <p>تمام محتوای بالا را کپی کرده یا با دکمه دانلود دریافت نمایید. سپس در داشبورد Cloudflare به ورکر ساخته‌شده رفته، دکمه <strong>Edit Code</strong> را بزنید، محتوای قبلی فایل <code>_worker.js</code> را پاک کرده و کدهای این فایل را جایگزین نموده و دکمه <strong>Deploy</strong> را کلیک کنید.</p>
                         </div>
                     </div>
                 </section>
@@ -409,133 +403,45 @@
             document.getElementById('copy-iot-db').addEventListener('click', () => copyToClipboard('IOT_DB'));
             document.getElementById('copy-admin').addEventListener('click', () => copyToClipboard('admin'));
 
-            const originalCodeArea = document.getElementById('original-code-area');
-            const obfuscatedCodeArea = document.getElementById('obfuscated-code-area');
+            const encodedCodeArea = document.getElementById('encoded-code-area');
             const fetchCodeBtn = document.getElementById('fetch-code-btn');
-            const copyOriginalBtn = document.getElementById('copy-original-btn');
-            const copyObfuscatedBtn = document.getElementById('copy-obfuscated-btn');
-            const downloadObfuscatedBtn = document.getElementById('download-obfuscated-btn');
+            const copyCodeBtn = document.getElementById('copy-code-btn');
+            const downloadCodeBtn = document.getElementById('download-code-btn');
 
-            fetchCodeBtn.addEventListener('click', async () => {
-                originalCodeArea.value = "در حال ارتباط با سرورهای گیت‌هاب...";
+            const ENCODED_WORKER_URL = 'https://raw.githubusercontent.com/itsyebekhe/nahan/main/_worker.encode.js';
+
+            const loadEncodedWorker = async () => {
+                encodedCodeArea.value = "// در حال دریافت کدهای ورکر نسخه Encoded از گیت‌هاب...";
                 try {
-                    const res = await fetch('https://raw.githubusercontent.com/itsyebekhe/nahan/refs/heads/main/_worker.js');
+                    const res = await fetch(ENCODED_WORKER_URL);
                     if (res.ok) {
-                        originalCodeArea.value = await res.text();
-                        obfuscateSourceCode();
-                        showToast("کدهای ورکر دریافت و مبهم‌سازی شدند!");
+                        const code = await res.text();
+                        encodedCodeArea.value = code;
+                        showToast("کدهای _worker.encode.js با موفقیت لود شدند");
                     } else {
-                        originalCodeArea.value = "خطا در برقراری ارتباط با گیت‌هاب. لطفاً کدها را دستی پیست کنید.";
+                        encodedCodeArea.value = "// دریافت از گیت‌هاب با خطا مواجه شد (" + res.status + "). لطفاً مجدداً امتحان کنید.";
                     }
                 } catch (e) {
-                    originalCodeArea.value = "خطای اتصال به شبکه. لطفاً پروکسی یا اینترنت خود را بررسی نمایید.";
+                    encodedCodeArea.value = "// خطای شبکه در دریافت سورس از گیت‌هاب. لطفاً اتصال اینترنت خود را بررسی کنید.";
+                }
+            };
+
+            fetchCodeBtn.addEventListener('click', loadEncodedWorker);
+
+            copyCodeBtn.addEventListener('click', () => {
+                if (encodedCodeArea.value && !encodedCodeArea.value.startsWith("//")) {
+                    navigator.clipboard.writeText(encodedCodeArea.value).then(() => showToast("تمام کدهای _worker.encode.js کپی شدند!")).catch(() => showToast("خطا در کپی!"));
+                } else {
+                    showToast("کدی برای کپی وجود ندارد");
                 }
             });
 
-            const parseImportBindings = (importStr) => {
-                const content = importStr.replace(/^import\s+/, '').replace(/\s+from\s+["'].*?["'];?$/, '').trim();
-                const bindings = new Set();
-                
-                const cleanContent = content.replace(/[{}]/g, ' ').replace(/\s+as\s+/g, ' ').replace(/,/g, ' ');
-                cleanContent.split(/\s+/).forEach(item => {
-                    if (item && item !== '*') bindings.add(item);
-                });
-                
-                return Array.from(bindings);
-            };
-
-            const obfuscateSourceCode = () => {
-                const srcText = originalCodeArea.value;
-                
-                if (!srcText || !srcText.trim() || srcText.startsWith("کدهای ورکر را اینجا") || srcText.startsWith("در حال ارتباط با سرورهای")) {
-                    obfuscatedCodeArea.value = "";
+            downloadCodeBtn.addEventListener('click', () => {
+                const text = encodedCodeArea.value;
+                if (!text || text.startsWith("//")) {
+                    showToast("ابتدا اجازه دهید کدها لود شوند");
                     return;
                 }
-
-                try {
-                    const importRegex = /^import\s+[\s\S]*?from\s+["'].*?["'];?$/gm;
-                    const imports = [];
-                    let match;
-                    
-                    while ((match = importRegex.exec(srcText)) !== null) {
-                        imports.push(match[0].trim());
-                    }
-                    
-                    let cleanCode = srcText.replace(importRegex, '').trim();
-                    
-                    const bindingNames = new Set();
-                    imports.forEach(imp => {
-                        parseImportBindings(imp).forEach(b => bindingNames.add(b));
-                    });
-                    const bindingsArr = Array.from(bindingNames);
-                    
-                    if (cleanCode.includes('export default')) {
-                        cleanCode = cleanCode.replace(/export\s+default\s+/, 'const _0xNahanModule = ');
-                        cleanCode += '\nreturn _0xNahanModule;';
-                    } else {
-                        cleanCode += '\nreturn undefined;';
-                    }
-                    
-                    const encoder = new TextEncoder();
-                    const bytes = encoder.encode(cleanCode);
-                    const keyBytes = new Uint8Array(16);
-                    crypto.getRandomValues(keyBytes);
-                    
-                    const xoredBytes = new Uint8Array(bytes.length);
-                    for (let i = 0; i < bytes.length; i++) {
-                        xoredBytes[i] = bytes[i] ^ keyBytes[i % keyBytes.length];
-                    }
-                    
-                    let binaryString = '';
-                    const chunkSize = 0x8000;
-                    for (let i = 0; i < xoredBytes.length; i += chunkSize) {
-                        binaryString += String.fromCharCode.apply(null, xoredBytes.subarray(i, i + chunkSize));
-                    }
-                    const b64Payload = btoa(binaryString);
-                    const keyHex = Array.from(keyBytes).map(b => b.toString(16).padStart(2, '0')).join('');
-                    
-                    const rawImportsStr = imports.join('\n');
-                    const bindingParams = bindingsArr.map(n => `"${n}"`).join(', ');
-                    const bindingArgs = bindingsArr.join(', ');
-                    
-                    const finalLoaderCode = `${rawImportsStr}
-
-const _0xPayload = "${b64Payload}";
-const _0xKeyHex = "${keyHex}";
-const _0xKey = _0xKeyHex.match(/.{1,2}/g).map(h => parseInt(h, 16));
-const _0xRaw = atob(_0xPayload);
-const _0xBytes = new Uint8Array(_0xRaw.length);
-for (let i = 0; i < _0xRaw.length; i++) {
-    _0xBytes[i] = _0xRaw.charCodeAt(i) ^ _0xKey[i % _0xKey.length];
-}
-const _0xCode = new TextDecoder().decode(_0xBytes);
-const _0xRuntime = new Function(${bindingParams}, _0xCode)(${bindingArgs});
-
-export default _0xRuntime;`;
-
-                    obfuscatedCodeArea.value = finalLoaderCode;
-                } catch (err) {
-                    obfuscatedCodeArea.value = "خطایی در پردازش کدها رخ داد: " + err.message;
-                }
-            };
-
-            let debounceTimer;
-            originalCodeArea.addEventListener('input', () => {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(obfuscateSourceCode, 400);
-            });
-
-            copyOriginalBtn.addEventListener('click', () => {
-                if (originalCodeArea.value) copyToClipboard(originalCodeArea.value);
-            });
-
-            copyObfuscatedBtn.addEventListener('click', () => {
-                if (obfuscatedCodeArea.value) copyToClipboard(obfuscatedCodeArea.value);
-            });
-
-            downloadObfuscatedBtn.addEventListener('click', () => {
-                const text = obfuscatedCodeArea.value;
-                if (!text) return;
                 const blob = new Blob([text], { type: 'text/javascript;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -545,7 +451,11 @@ export default _0xRuntime;`;
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
+                showToast("فایل _worker.js دانلود شد");
             });
+
+            // Initial load
+            loadEncodedWorker();
         })();
     </script>
 </body>
