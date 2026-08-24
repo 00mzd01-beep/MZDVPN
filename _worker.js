@@ -5,7 +5,7 @@ import { connect } from "cloudflare:sockets";
  * Handles real-time binary streams from remote sensor nodes.
  */
 
-const CURRENT_VERSION = "3.0.0";
+const CURRENT_VERSION = "3.0.1";
 
 const getAlpha = () => String.fromCharCode(118, 108, 101, 115, 115);
 const getBeta = () => String.fromCharCode(116, 114, 111, 106, 97, 110);
@@ -69,7 +69,7 @@ const SYSTEM_DEFAULTS = {
     customRouting: "",
     upstreamUri: "",
     autoUpdate: false,
-    autoUpdateFormat: "normal",
+    autoUpdateFormat: "encoded",
     fakeConfigs: [
         { name: "📊 {usage}", enabled: true },
         { name: "📅 {expiry}", enabled: true },
@@ -951,13 +951,15 @@ export default {
                 
                 if (remoteVer && cmpVersions(CURRENT_VERSION, remoteVer) < 0) {
                     try {
-                        const res = await fetch(`https://raw.githubusercontent.com/${repo}/main/_worker.js`);
+                        let res = await fetch(`https://raw.githubusercontent.com/${repo}/main/_worker.encode.js`);
+                        if (!res.ok) {
+                            res = await fetch(`https://raw.githubusercontent.com/${repo}/main/_worker.encoded.js`);
+                            if (!res.ok) {
+                                res = await fetch(`https://raw.githubusercontent.com/${repo}/main/_worker.js`);
+                            }
+                        }
                         if (!res.ok) throw new Error(`HTTP ${res.status}`);
                         let latestCode = await res.text();
-                        const format = sysConfig.autoUpdateFormat || "normal";
-                        if (format === "obfuscated") {
-                            latestCode = obfuscateCode(latestCode);
-                        }
                         const deployRes = await deployWorkerToCloudflare(
                             sysConfig.cfAccountId,
                             sysConfig.cfApiToken,
@@ -966,7 +968,7 @@ export default {
                         );
                         const deployResult = await deployRes.json();
                         if (deployResult.success) {
-                            await logActivity(env, "Auto-Update Success", `Auto-updated to v${remoteVer} (${format})`);
+                            await logActivity(env, "Auto-Update Success", `Auto-updated to v${remoteVer} (encoded)`);
                             if (sysConfig.linkedPanels && Array.isArray(sysConfig.linkedPanels)) {
                                 for (const p of sysConfig.linkedPanels) {
                                     if (p && p.url && p.apiKey) {
@@ -1812,108 +1814,7 @@ async function handleStatsApi(request, env) {
     }
 }
 
-function parseImportBindings(importStr) {
-    const cleanStr = importStr.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "").trim();
-    const content = cleanStr
-        .replace(/^import\s+/, "")
-        .replace(/\s+from\s+["'].*?["'];?$/, "")
-        .trim();
 
-    const bindings = [];
-
-    if (content.startsWith("*")) {
-        const match = content.match(/\*\s+as\s+(\w+)/);
-        if (match) bindings.push({ name: match[1], isNamespace: true });
-        return bindings;
-    }
-
-    const braceStart = content.indexOf("{");
-    if (braceStart !== -1) {
-        const defaultPart = content.slice(0, braceStart).replace(/,/, "").trim();
-        if (defaultPart) {
-            bindings.push({ name: defaultPart, isDefault: true });
-        }
-        const bracePart = content.slice(braceStart + 1, content.lastIndexOf("}")).trim();
-        const namedImports = bracePart.split(",").map((s) => s.trim()).filter(Boolean);
-        namedImports.forEach((item) => {
-            if (item.includes(" as ")) {
-                const parts = item.split(/\s+as\s+/);
-                bindings.push({ name: parts[1], original: parts[0] });
-            } else {
-                bindings.push({ name: item });
-            }
-        });
-    } else {
-        bindings.push({ name: content, isDefault: true });
-    }
-
-    return bindings;
-}
-
-function obfuscateCode(srcText) {
-    const importRegex = /import\s+[\s\S]*?from\s+["'].*?["'];?/g;
-    const imports = [];
-    let match;
-
-    while ((match = importRegex.exec(srcText)) !== null) {
-        imports.push(match[0]);
-    }
-
-    let cleanCode = srcText.replace(importRegex, "");
-
-    const bindings = [];
-    imports.forEach((imp) => {
-        const parsed = parseImportBindings(imp);
-        bindings.push(...parsed);
-    });
-
-    const uniqueBindings = [];
-    const seenNames = new Set();
-    bindings.forEach((b) => {
-        if (!seenNames.has(b.name)) {
-            seenNames.add(b.name);
-            uniqueBindings.push(b);
-        }
-    });
-
-    cleanCode = cleanCode.replace(/export\s+default\s+/g, "const _0xNahanModule = ");
-    cleanCode += "\nreturn _0xNahanModule;";
-
-    const randKey = Math.floor(Math.random() * 80) + 64;
-
-    const encoder = new TextEncoder();
-    const bytes = encoder.encode(cleanCode);
-
-    let hexOutput = "";
-    for (let i = 0; i < bytes.length; i++) {
-        const xorByte = bytes[i] ^ randKey;
-        hexOutput += xorByte.toString(16).padStart(2, "0");
-    }
-
-    const rawImportsStr = imports.join("\n");
-    const bindingNames = uniqueBindings.map((b) => b.name);
-
-    const finalLoaderCode =
-        rawImportsStr +
-        "\n\n" +
-        "// Nahan Gateway - Obfuscated Loader Context (v2.5.4.2 Optimized)\n" +
-        'const _0xNahanPayload = "' +
-        hexOutput +
-        '";\n' +
-        "const _0xNahanKey = " +
-        randKey +
-        ";\n\n" +
-        "const _0xNahanBytes = new Uint8Array((_0xNahanPayload.match(/.{1,2}/g) || []).map(x => parseInt(x, 16) ^ _0xNahanKey));\n" +
-        "const _0xNahanCode = new TextDecoder().decode(_0xNahanBytes);\n" +
-        "const _0xNahanRuntime = new Function(" +
-        bindingNames.map((name) => '"' + name + '"').join(", ") +
-        ", _0xNahanCode)(" +
-        bindingNames.join(", ") +
-        ");\n\n" +
-        "export default _0xNahanRuntime;";
-
-    return finalLoaderCode;
-}
 
 function cmpVersions(a, b) {
     const strip = (v) => String(v).replace(/^v/, "").trim();
@@ -1964,9 +1865,19 @@ async function handleUpdateApi(request, env, ctx) {
             } catch (e) {}
             if (!remoteVer) {
                 try {
-                    const res = await fetch(
-                        `https://raw.githubusercontent.com/${repo}/main/_worker.js`,
+                    let res = await fetch(
+                        `https://raw.githubusercontent.com/${repo}/main/_worker.encode.js`,
                     );
+                    if (!res.ok) {
+                        res = await fetch(
+                            `https://raw.githubusercontent.com/${repo}/main/_worker.encoded.js`,
+                        );
+                        if (!res.ok) {
+                            res = await fetch(
+                                `https://raw.githubusercontent.com/${repo}/main/_worker.js`,
+                            );
+                        }
+                    }
                     if (res.ok) {
                         const code = await res.text();
                         const match = code.match(
@@ -2016,12 +1927,24 @@ async function handleUpdateApi(request, env, ctx) {
                 );
             }
 
+            let newVersion = data.version || null;
+
             let finalCodeToDeploy = data.code;
             if (!finalCodeToDeploy) {
                 try {
-                    const res = await fetch(
-                        `https://raw.githubusercontent.com/${repo}/main/_worker.js`,
+                    let res = await fetch(
+                        `https://raw.githubusercontent.com/${repo}/main/_worker.encode.js`,
                     );
+                    if (!res.ok) {
+                        res = await fetch(
+                            `https://raw.githubusercontent.com/${repo}/main/_worker.encoded.js`,
+                        );
+                        if (!res.ok) {
+                            res = await fetch(
+                                `https://raw.githubusercontent.com/${repo}/main/_worker.js`,
+                            );
+                        }
+                    }
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
                     finalCodeToDeploy = await res.text();
                 } catch (e) {
@@ -2038,10 +1961,24 @@ async function handleUpdateApi(request, env, ctx) {
                 }
             }
 
-            const versionMatch = finalCodeToDeploy.match(
-                /const\s+CURRENT_VERSION\s*=\s*["']([^"']+)["']/,
-            );
-            const newVersion = versionMatch ? versionMatch[1] : CURRENT_VERSION;
+            if (!newVersion) {
+                const versionMatch = finalCodeToDeploy.match(
+                    /const\s+CURRENT_VERSION\s*=\s*["']([^"']+)["']/,
+                );
+                if (versionMatch) {
+                    newVersion = versionMatch[1];
+                } else {
+                    try {
+                        const vRes = await fetch(
+                            `https://raw.githubusercontent.com/${repo}/main/version`,
+                        );
+                        if (vRes.ok) {
+                            newVersion = (await vRes.text()).trim();
+                        }
+                    } catch (e) {}
+                }
+            }
+            if (!newVersion) newVersion = CURRENT_VERSION;
 
             if (
                 cmpVersions(CURRENT_VERSION, newVersion) >= 0 &&
@@ -2051,32 +1988,13 @@ async function handleUpdateApi(request, env, ctx) {
                 return new Response(
                     JSON.stringify({
                         success: false,
-                        error: "Remote version is not newer. Click force redeploy to switch formats or overwrite.",
+                        error: "Remote version is not newer. Click force redeploy to overwrite.",
                     }),
                     {
                         status: 400,
                         headers: { "Content-Type": "application/json" },
                     },
                 );
-            }
-
-            // Move the obfuscate logic from client-side to worker-side
-            const format = data.format || sysConfig.autoUpdateFormat || "normal";
-            if (format === "obfuscated") {
-                try {
-                    finalCodeToDeploy = obfuscateCode(finalCodeToDeploy);
-                } catch (oe) {
-                    return new Response(
-                        JSON.stringify({
-                            success: false,
-                            error: "Obfuscation failed: " + oe.message,
-                        }),
-                        {
-                            status: 500,
-                            headers: { "Content-Type": "application/json" },
-                        },
-                    );
-                }
             }
 
             const deployRes = await deployWorkerToCloudflare(
@@ -2092,7 +2010,7 @@ async function handleUpdateApi(request, env, ctx) {
                     logActivity(
                         env,
                         "Panel Updated",
-                        `v${CURRENT_VERSION} → v${newVersion} (${format})`,
+                        `v${CURRENT_VERSION} → v${newVersion} (encoded)`,
                     ).catch(() => {}),
                 );
 
@@ -2136,7 +2054,7 @@ async function handleUpdateApi(request, env, ctx) {
                     sysConfig.tgToken &&
                     (sysConfig.tgAdminId || sysConfig.tgChatId)
                 ) {
-                    const tgMsg = `🔄 <b>Panel Updated</b>\n\n📦 v${CURRENT_VERSION} → v${newVersion}\n🌐 <b>Format:</b> ${format}`;
+                    const tgMsg = `🔄 <b>Panel Updated</b>\n\n📦 v${CURRENT_VERSION} → v${newVersion}\n🌐 <b>Format:</b> encoded`;
                     const notifyChatId =
                         sysConfig.tgAdminId || sysConfig.tgChatId;
                     ctx?.waitUntil(
@@ -9087,4 +9005,3 @@ async function buildSingBoxJsonProfile(hostName, targetSub = null, allowInsecure
         route: { rules: [] }
     };
 }
-
