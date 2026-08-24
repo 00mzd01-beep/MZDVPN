@@ -8,6 +8,26 @@ All notable changes to Project Nahan will be documented in this file.
 <!-- LANG:EN -->
 
 
+## [3.0.1] - ۱۴۰۵-۰۶-۰۲ (2026-08-24)
+
+<!-- LANG:FA -->
+### تغییرات (Changed)
+- **اجباری شدن نسخه اینکد شده در ورکر**: فرآیند بروزرسانی و استقرار ورکر به صورت پیش‌فرض و دائمی فقط از نسخه کدگذاری شده (`_worker.encode.js`) استفاده می‌کند و گزینه انتخاب نسخه عادی حذف شد.
+
+### رفع شده (Fixed)
+- **اصلاح کاراکترهای اسکیپ در پروکسی اینستالر**: تصحیح اسکیپ عبارات باقاعده (Regex) و قالب‌های رشته‌ای در کد خروجی پروکسی ورکر اینستالر جهت اجرای بدون خطا در کلودفلر.
+<!-- LANG:FA -->
+
+<!-- LANG:EN -->
+### Changed
+- **Enforced Encoded Worker Version**: Auto-update and worker redeployments now strictly and exclusively use the encoded worker (`_worker.encode.js`), removing the option to select plain/normal format.
+
+### Fixed
+- **Installer Proxy RegExp Escaping**: Fixed escaping in regular expression path matchers and string interpolation for the installer proxy worker template.
+<!-- LANG:EN -->
+
+---
+
 ## [3.0.0] - ۱۴۰۵-۰۵-۰۶ (2026-07-27)
 
 <!-- LANG:FA -->
