@@ -119,12 +119,12 @@
 
     <!-- Global Controls -->
     <div class="fixed top-4 end-4 md:top-5 md:end-5 flex items-center gap-2 z-50">
-        <span id="top-version-badge" class="hidden md:inline-block px-3 py-1.5 rounded-xl text-[11px] font-mono font-bold" style="background: color-mix(in srgb, var(--color-primary) 12%, transparent); border: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent); color: var(--color-primary);">v__CURRENT_VERSION__</span>
+        <span id="top-version-badge" class="hidden md:inline-block px-3 py-1.5 rounded-xl text-[11px] font-mono font-bold" style="background: color-mix(in srgb, var(--color-primary) 12%, transparent); border: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent); color: var(--color-primary);">v3.0.0</span>
         
-        <!-- دکمه تغییر زبان (فعال) -->
+        <!-- دکمه تغییر زبان -->
         <button onclick="toggleLang()" id="lang-toggle" class="px-3 py-1.5 rounded-xl text-sm font-bold transition-all shadow-sm cursor-pointer" style="background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text);">EN</button>
         
-        <!-- دکمه تغییر حالت روز/شب (فعال) -->
+        <!-- دکمه تغییر حالت روز/شب -->
         <button onclick="toggleTheme()" class="p-2 rounded-xl transition-all shadow-sm cursor-pointer" style="background: var(--color-surface); border: 1px solid var(--color-border); color: #f59e0b;" title="Toggle Theme">
             <svg class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             <svg class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -158,7 +158,6 @@
                         <span class="flex-1"></span>
                         <span class="text-xs" style="color: var(--color-text-muted); opacity: 0.8;">🔒 Secure connection</span>
                     </div>
-                    __HAS_DB_WARNING__
                     <div class="mb-5">
                         <label class="block text-sm font-semibold mb-2.5 text-start" style="color: var(--color-text-muted);" data-i18n="login_password">Password</label>
                         <div class="relative">
@@ -182,13 +181,53 @@
 
     <!-- DASHBOARD CONTAINER -->
     <div id="dash-box" class="hidden w-full h-full flex-col md:flex-row relative">
-        <!-- پنل اصلی داشبورد -->
+        <aside class="hidden md:flex w-64 bg-[var(--color-surface)] border-e border-slate-200 dark:border-darkborder flex-col z-20 shrink-0">
+            <div class="flex items-center p-6 border-b border-slate-100 dark:border-darkborder/50">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center me-3 shrink-0 overflow-hidden" style="border: 1px solid var(--color-primary);">
+                    <img src="https://raw.githubusercontent.com/00mzd01-beep/MZDVPN/main/download.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="font-black text-xl leading-none" data-i18n="title">MZDVPN</h1>
+                </div>
+            </div>
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <button onclick="switchTab('overview')" id="tab-overview" class="nav-item active flex items-center w-full px-4 py-3 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-white group">
+                    <span class="font-semibold" data-i18n="tab_overview">Dashboard</span>
+                </button>
+            </nav>
+        </aside>
+        <main class="flex-1 flex flex-col h-full overflow-hidden">
+            <header class="h-14 md:h-24 shrink-0 flex items-center px-4 md:px-10 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
+                <h2 id="view-title" class="text-lg md:text-3xl font-black">Overview</h2>
+            </header>
+            <div class="scroll-content flex-1 overflow-y-auto p-4 md:p-10"></div>
+        </main>
     </div>
 
     <script>
+        const i18n = {
+            en: {
+                title: "MZDVPN",
+                pass_ph: "Master Key",
+                login_btn: "Sign In",
+                err_pass: "Wrong password, please try again.",
+                system_online: "System online",
+                logout: "Disconnect",
+                tab_overview: "Dashboard"
+            },
+            fa: {
+                title: "MZDVPN",
+                pass_ph: "رمز ورود",
+                login_btn: "ورود به سیستم",
+                err_pass: "رمز عبور اشتباه است، لطفاً دوباره تلاش کنید.",
+                system_online: "سیستم فعال است",
+                logout: "خروج",
+                tab_overview: "نمای کلی"
+            }
+        };
+
         let lang = localStorage.getItem('lang') || 'fa';
 
-        // عملکرد دکمه تغییر زبان
         function toggleLang() {
             lang = lang === 'fa' ? 'en' : 'fa';
             localStorage.setItem('lang', lang);
@@ -203,17 +242,16 @@
 
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (window.i18n && window.i18n[lang] && window.i18n[lang][key]) {
+                if (i18n[lang] && i18n[lang][key]) {
                     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                        el.placeholder = window.i18n[lang][key];
+                        el.placeholder = i18n[lang][key];
                     } else {
-                        el.innerText = window.i18n[lang][key];
+                        el.innerText = i18n[lang][key];
                     }
                 }
             });
         }
 
-        // عملکرد دکمه روز و شب
         function toggleTheme() {
             const root = document.documentElement;
             if (root.classList.contains('dark')) {
@@ -225,7 +263,6 @@
             }
         }
 
-        // تنظیم اولیه تم و زبان در بارگذاری صفحه
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'light') {
@@ -235,6 +272,13 @@
             }
             applyLang();
         });
+
+        function doLogin() {
+            // توابع لاگین شما
+            document.getElementById('login-box').classList.add('hidden');
+            document.getElementById('dash-box').classList.remove('hidden');
+            document.getElementById('dash-box').classList.add('flex');
+        }
     </script>
 </body>
 </html>
